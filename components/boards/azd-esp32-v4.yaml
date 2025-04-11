@@ -9,14 +9,14 @@ esp32:
       COMPILER_OPTIMIZATION_SIZE: y
 
 uart:
-  id: uart_Automower
+  id: uart_automower
   rx_pin:
-    number: ${rxpin}
+    number: GPIO16
   tx_pin:
-    number: ${txpin}
-  baud_rate: ${baud}
+    number: GPIO17
+  baud_rate: 9600
 
 sensor:
   - platform: internal_temperature
-    name: "ESP Temperature"
+    name: ${internal_esp_temperature}
     entity_category: diagnostic

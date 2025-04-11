@@ -1,0 +1,21 @@
+sensor:
+- platform: custom
+  lambda: |-
+      Automower *mower = (Automower *) id(automower);
+      return {mower->batteryLevelSensor,mower->chargingTimeSensor,mower->batteryUsedSensor,mower->batteryVoltageSensor,mower->firmwareVersionSensor}; 
+
+  sensors:
+    - id: batteryLevelSensor
+      name: "Battery level"
+      unit_of_measurement: mAh
+    - id: chargingTimeSensor
+      name: "Charging time"
+      unit_of_measurement: min
+    - id: batteryUsedSensor
+      name: "Battery used"
+      unit_of_measurement: mAh
+    - id: batteryVoltageSensor
+      name: "Battery voltage"
+      unit_of_measurement: V
+    - id: firmwareVersionSensor
+      name: "Firmware version"

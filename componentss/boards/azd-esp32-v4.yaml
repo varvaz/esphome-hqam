@@ -1,0 +1,22 @@
+# For use with: https://docs.platformio.org/en/stable/boards/espressif32/az-delivery-devkit-v4.html
+esp32:
+  board: az-delivery-devkit-v4
+  framework:
+    type: esp-idf
+    version: recommended
+    # Custom sdkconfig options#
+    sdkconfig_options:
+      COMPILER_OPTIMIZATION_SIZE: y
+
+uart:
+  id: uart_automower
+  rx_pin:
+    number: GPIO16
+  tx_pin:
+    number: GPIO17
+  baud_rate: 9600
+
+sensor:
+  - platform: internal_temperature
+    name: ${internal_esp_temperature}
+    entity_category: diagnostic

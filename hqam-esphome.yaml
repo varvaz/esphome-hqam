@@ -1,0 +1,50 @@
+substitutions:
+  name: "devicename"
+  friendlyName: "Device Name"
+  timezone: "Europe/Stockholm"
+
+esphome:
+  name: ${name}
+  friendly_name: ${friendlyName}
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+    timezone: ${timezone}
+
+api:
+  encryption:
+    key: "YOUR_API"
+
+ota:
+  - platform: esphome
+    password: "YOUR_OTA"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "${friendlyName} Fallback Hotspot"
+    password: "YOUR_AP"
+
+captive_portal:
+
+external_components:
+  - source: github://Bokenbergen/esphome-hqam@main
+    refresh: always
+
+packages:
+  remote_package:
+    url: https://github.com/Bokenbergen/esphome-hqam
+    ref: main
+    refresh: always
+    files: [
+      components/boards/azd-esp32-v4.yaml,
+      components/confs/button.yaml,
+      components/confs/select.yaml,
+      components/confs/sensor.yaml,
+      components/confs/textsensor.yaml,
+      components/confs/switch.yaml
+    ]

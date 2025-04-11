@@ -1,6 +1,10 @@
 #pragma once
 
 #include "esphome.h"
+#include <sstream>
+#include <iostream>
+#include <iomanip>
+#include <list>
 
 namespace esphome {
 namespace automower {

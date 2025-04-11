@@ -11,12 +11,12 @@ esp32:
 uart:
   id: uart_automower
   rx_pin:
-    number: GPIO16
+    number: ${rxpin}
   tx_pin:
-    number: GPIO17
-  baud_rate: 9600
+    number: ${txpin}
+  baud_rate: ${baud}
 
 sensor:
   - platform: internal_temperature
-    name: ${internal_esp_temperature}
+    name: "ESP Temperature"
     entity_category: diagnostic

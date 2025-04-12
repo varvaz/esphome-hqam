@@ -3,17 +3,22 @@
 #include "esphome/core/component.h"
 #include "esphome/components/uart/uart.h"
 #include "esphome/components/sensor/sensor.h"
-#include "esphome/components/text_sensor/text_sensor.h"
+
+// Forward-declare the TextSensor class instead of including its header.
+namespace esphome {
+  namespace text_sensor {
+    class TextSensor;
+  }
+}
 
 namespace esphome {
 namespace mower {
 
 class Automower : public PollingComponent, public uart::UARTDevice {
  public:
-  // Constructor. Uses a parent UART component and an update interval.
   Automower(uart::UARTComponent *parent, uint32_t update_interval)
     : PollingComponent(update_interval), uart::UARTDevice(parent) {
-      // Set sensor accuracy if the sensors exist.
+      // Set sensor accuracy as needed.
       battery_level_sensor_->set_accuracy_decimals(0);
       charging_time_sensor_->set_accuracy_decimals(0);
       battery_used_sensor_->set_accuracy_decimals(0);
@@ -35,7 +40,7 @@ class Automower : public PollingComponent, public uart::UARTDevice {
   static constexpr uint8_t getStatusCode[5]    = {0x0F, 0x01, 0xF1, 0x00, 0x00};
   static constexpr uint8_t getChargingTime[5]  = {0x0F, 0x01, 0xEC, 0x00, 0x00};
   static constexpr uint8_t getBatteryCurrent[5]= {0x0F, 0x01, 0xEB, 0x00, 0x00}; // mA
-  static constexpr uint8_t getBatteryLevel[5]  = {0x0F, 0x01, 0xEF, 0x00, 0x00}; // Battery capacity in mAh 
+  static constexpr uint8_t getBatteryLevel[5]  = {0x0F, 0x01, 0xEF, 0x00, 0x00}; // Capacity in mAh
   static constexpr uint8_t getBatteryCapacityAtSearchStart[5] = {0x0F, 0x01, 0xF0, 0x00, 0x00};
   static constexpr uint8_t getBatteryUsed[5]   = {0x0F, 0x2E, 0xE0, 0x00, 0x00};
   static constexpr uint8_t getBatteryVoltage[5]= {0x0F, 0x2E, 0xF4, 0x00, 0x00}; // in mV
@@ -56,18 +61,18 @@ class Automower : public PollingComponent, public uart::UARTDevice {
   bool _writable = true;
   bool stopStatus = false;
 
-  // Sensor objects. (Instantiated here; you may choose to configure them differently.)
+  // Sensor objects (instantiated here; you might want to set these via configuration instead)
   sensor::Sensor *battery_level_sensor_    = new sensor::Sensor();
   sensor::Sensor *battery_used_sensor_     = new sensor::Sensor();
   sensor::Sensor *charging_time_sensor_    = new sensor::Sensor();
   sensor::Sensor *battery_voltage_sensor_  = new sensor::Sensor();
   sensor::Sensor *firmware_version_sensor_ = new sensor::Sensor();
-  text_sensor::TextSensor *mode_text_sensor_= new text_sensor::TextSensor();
+  text_sensor::TextSensor *mode_text_sensor_ = new text_sensor::TextSensor();
   text_sensor::TextSensor *status_text_sensor_ = new text_sensor::TextSensor();
-  text_sensor::TextSensor *last_code_received_text_sensor_
-                                           = new text_sensor::TextSensor();
+  text_sensor::TextSensor *last_code_received_text_sensor_ =
+                                        new text_sensor::TextSensor();
 
-  // Action methods.
+  // Command methods.
   void setMode(const std::string &value) {
     if (value == "MAN") {
       write_array(MAN_DATA, sizeof(MAN_DATA));
@@ -137,7 +142,7 @@ class Automower : public PollingComponent, public uart::UARTDevice {
 
   // ESPHome lifecycle methods.
   void setup() override {
-    // Additional setup code can be added here if needed.
+    // Add additional setup here if needed.
   }
 
   void update() override {
@@ -149,12 +154,11 @@ class Automower : public PollingComponent, public uart::UARTDevice {
   }
 
  protected:
-  // Recursive send command method.
   void sendCommands(int index) {
     if (index <= (int)pollingCommandList.size() - 1) {
       set_retry(
-          5,    // Initial wait time in milliseconds.
-          3,    // Maximum number of attempts.
+          5,    // Initial wait time (ms)
+          3,    // Maximum number of attempts
           [this, index](uint8_t attempt) -> RetryResult {
             if (!_writable) {
               return RetryResult::RETRY;
@@ -172,7 +176,6 @@ class Automower : public PollingComponent, public uart::UARTDevice {
     }
   }
 
-  // Reads data from UART and processes it.
   void checkUartRead() {
     while (available() > 0 && peek() != 0x0F) {
       read();
@@ -216,7 +219,6 @@ class Automower : public PollingComponent, public uart::UARTDevice {
     }
   }
 
-  // Sets the stop status based on a received code.
   void setStopStatusFromCode(uint16_t receivedValue) {
     switch (receivedValue) {
       case 0x0000:
@@ -234,7 +236,6 @@ class Automower : public PollingComponent, public uart::UARTDevice {
     }
   }
 
-  // Publishes the operating mode.
   void publishMode(uint16_t receivedValue) {
     std::string mode;
     switch (receivedValue) {
@@ -260,7 +261,6 @@ class Automower : public PollingComponent, public uart::UARTDevice {
     mode_text_sensor_->publish_state(mode);
   }
 
-  // Publishes the status message.
   void publishStatus(uint16_t receivedValue) {
     switch (receivedValue) {
       case 0x0006:

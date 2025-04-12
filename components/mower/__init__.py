@@ -6,10 +6,10 @@ from esphome.const import CONF_ID
 
 # Create namespace and define component class
 automower_ns = cg.esphome_ns.namespace('automower')
-AutomowerComponent = automower_ns.class_('AutomowerComponent', cg.Component)
+automowercomponent = automower_ns.class_('automowercomponent', cg.Component)
 
 CONFIG_SCHEMA = cv.Schema({
-    cv.GenerateID(): cv.declare_id(AutomowerComponent),
+    cv.GenerateID(): cv.declare_id(automowercomponent),
 }).extend(cv.COMPONENT_SCHEMA)
 
 def to_code(config):

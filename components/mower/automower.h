@@ -119,8 +119,13 @@ class Automower : public PollingComponent, public uart::UARTDevice {
       uint8_t readData[5];
       read_array(readData, 5);
       _writable = true;
+
+      ESP_LOGD("Automower", "UART RX: %02X %02X %02X %02X %02X", readData[0], readData[1], readData[2], readData[3], readData[4]);
+
       uint16_t addr = ((readData[1] & 0x7F) << 8) | readData[2];
       uint16_t val  = (readData[4] << 8) | readData[3];
+
+      ESP_LOGD("Automower", "Decoded: addr=0x%04X val=0x%04X", addr, val);
 
       switch (addr) {
         case 0x012C: publishMode(val); break;
@@ -131,7 +136,9 @@ class Automower : public PollingComponent, public uart::UARTDevice {
         case 0x2EF4: if (battery_voltage_sensor_) battery_voltage_sensor_->publish_state(val / 1000.0f); break;
         case 0x3390: if (firmware_version_sensor_) firmware_version_sensor_->publish_state(val); break;
         case 0x012F: setStopStatusFromCode(val); break;
-        default: break;
+        default:
+          ESP_LOGW("Automower", "Unhandled address: 0x%04X with value 0x%04X", addr, val);
+          break;
       }
     }
   }

@@ -1,0 +1,21 @@
+esp32:
+  board: esp32dev
+  framework:
+    type: esp-idf
+    version: recommended
+    # Custom sdkconfig options#
+    sdkconfig_options:
+      COMPILER_OPTIMIZATION_SIZE: y
+
+uart:
+  id: uart_automower
+  rx_pin:
+    number: ${rxpin}
+  tx_pin:
+    number: ${txpin}
+  baud_rate: ${baud}
+
+sensor:
+  - platform: internal_temperature
+    name: "ESP Temperature"
+    entity_category: diagnostic

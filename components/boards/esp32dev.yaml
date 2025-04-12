@@ -8,7 +8,7 @@ esp32:
       COMPILER_OPTIMIZATION_SIZE: y
 
 uart:
-  id: uart_automower
+  id: uart_mower
   rx_pin:
     number: ${rxpin}
   tx_pin:

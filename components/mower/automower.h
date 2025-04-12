@@ -1,11 +1,9 @@
-#include "esphome.h"
-#include <sstream>
-#include <iostream>
-#include <iomanip>
-#include <list>
+#pragma once
 
-
-
+#include "esphome/core/component.h"
+#include "esphome/components/uart/uart.h"
+#include "esphome/components/sensor/sensor.h"
+#include "esphome/components/switch/switch.h"
 
 class Automower : public PollingComponent, public UARTDevice {
 

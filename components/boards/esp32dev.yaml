@@ -14,6 +14,13 @@ uart:
   tx_pin:
     number: ${txpin}
   baud_rate: ${baud}
+  debug:
+    direction: BOTH
+    dummy_receiver: false
+    after:
+      delimiter: "\n"
+    sequence:
+      - lambda: UARTDebug::log_string(direction, bytes);
 
 sensor:
   - platform: internal_temperature

@@ -18,5 +18,5 @@ uart:
 
 sensor:
   - platform: internal_temperature
-    name: ${internal_esp_temperature}
+    name: "ESP Temperature"
     entity_category: diagnostic

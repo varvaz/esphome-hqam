@@ -27,6 +27,41 @@ class Automower : public PollingComponent, public uart::UARTDevice {
   void update() override { sendCommands(0); }
   void loop() override { checkUartRead(); }
 
+  void set_mode(const std::string &value) {
+    if (value == "MAN") {
+      write_array(MAN_DATA, sizeof(MAN_DATA));
+    } else if (value == "AUTO") {
+      write_array(AUTO_DATA, sizeof(AUTO_DATA));
+    } else if (value == "HOME") {
+      write_array(HOME_DATA, sizeof(HOME_DATA));
+    } else if (value == "DEMO") {
+      write_array(DEMO_DATA, sizeof(DEMO_DATA));
+    } else {
+      ESP_LOGE("Automower", "Unknown mode: %s", value.c_str());
+    }
+  }
+
+  void set_stop(bool stop) {
+    write_array(stop ? STOP_ON_DATA : STOP_OFF_DATA, 5);
+  }
+
+  void set_left_motor(int value) {
+    uint8_t data[5] = {0x0F, 0x92, 0x23, static_cast<uint8_t>((value >> 8) & 0xFF), static_cast<uint8_t>(value & 0xFF)};
+    write_array(data, 5);
+  }
+
+  void set_right_motor(int value) {
+    uint8_t data[5] = {0x0F, 0x92, 0x03, static_cast<uint8_t>((value >> 8) & 0xFF), static_cast<uint8_t>(value & 0xFF)};
+    write_array(data, 5);
+  }
+
+  void key_back() { write_array(KEY_BACK, 5); }
+  void key_yes()  { write_array(KEY_YES, 5); }
+  void key_num(uint8_t num) {
+    uint8_t data[5] = {0x0F, 0x80, 0x5F, 0x00, num};
+    write_array(data, 5);
+  }
+
  protected:
   bool _writable = true;
   bool stopStatus = false;
@@ -40,10 +75,23 @@ class Automower : public PollingComponent, public uart::UARTDevice {
   text_sensor::TextSensor *status_text_sensor_ = nullptr;
   text_sensor::TextSensor *last_code_received_text_sensor_ = nullptr;
 
-  static constexpr uint8_t MAN_DATA[5]  = {0x0F, 0x81, 0x2C, 0x00, 0x00};
-  static constexpr uint8_t AUTO_DATA[5] = {0x0F, 0x81, 0x2C, 0x00, 0x01};
-  static constexpr uint8_t HOME_DATA[5] = {0x0F, 0x81, 0x2C, 0x00, 0x03};
-  static constexpr uint8_t DEMO_DATA[5] = {0x0F, 0x81, 0x2C, 0x00, 0x04};
+  static constexpr uint8_t MAN_DATA[5]         = {0x0F, 0x81, 0x2C, 0x00, 0x00};
+  static constexpr uint8_t AUTO_DATA[5]        = {0x0F, 0x81, 0x2C, 0x00, 0x01};
+  static constexpr uint8_t HOME_DATA[5]        = {0x0F, 0x81, 0x2C, 0x00, 0x03};
+  static constexpr uint8_t DEMO_DATA[5]        = {0x0F, 0x81, 0x2C, 0x00, 0x04};
+  static constexpr uint8_t STOP_ON_DATA[5]     = {0x0F, 0x81, 0x2F, 0x00, 0x02};
+  static constexpr uint8_t STOP_OFF_DATA[5]    = {0x0F, 0x81, 0x2F, 0x00, 0x00};
+  static constexpr uint8_t KEY_BACK[5]         = {0x0F, 0x80, 0x5F, 0x00, 0x0F};
+  static constexpr uint8_t KEY_YES[5]          = {0x0F, 0x80, 0x5F, 0x00, 0x12};
+  static constexpr uint8_t getModeCmd[5]       = {0x0F, 0x01, 0x2C, 0x00, 0x00};
+  static constexpr uint8_t getStatusCode[5]    = {0x0F, 0x01, 0xF1, 0x00, 0x00};
+  static constexpr uint8_t getChargingTime[5]  = {0x0F, 0x01, 0xEC, 0x00, 0x00};
+  static constexpr uint8_t getBatteryCurrent[5]= {0x0F, 0x01, 0xEB, 0x00, 0x00};
+  static constexpr uint8_t getBatteryLevel[5]  = {0x0F, 0x01, 0xEF, 0x00, 0x00};
+  static constexpr uint8_t getBatteryUsed[5]   = {0x0F, 0x2E, 0xE0, 0x00, 0x00};
+  static constexpr uint8_t getBatteryVoltage[5]= {0x0F, 0x2E, 0xF4, 0x00, 0x00};
+  static constexpr uint8_t getFirmwareVersion[5]= {0x0F, 0x33, 0x90, 0x00, 0x00};
+  static constexpr uint8_t READ_STOP_CMD[5]    = {0x0F, 0x01, 0x2F, 0x00, 0x00};
 
   const std::list<const uint8_t *> pollingCommandList = {
     getModeCmd, getStatusCode, getBatteryLevel,

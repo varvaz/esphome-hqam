@@ -3,10 +3,6 @@ esp32:
   variant: ESP32S2
   framework:
     type: arduino
-    version: recommended
-    # Custom sdkconfig options#
-    sdkconfig_options:
-      COMPILER_OPTIMIZATION_SIZE: y
 
 uart:
   id: uart_mower

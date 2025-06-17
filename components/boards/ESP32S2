@@ -1,0 +1,29 @@
+esp32:
+  board: lolin_s2_mini
+  variant: ESP32S2
+  framework:
+    type: arduino
+    version: recommended
+    # Custom sdkconfig options#
+    sdkconfig_options:
+      COMPILER_OPTIMIZATION_SIZE: y
+
+uart:
+  id: uart_mower
+  rx_pin:
+    number: 2
+  tx_pin:
+    number: 15
+  baud_rate: 9600
+  debug:
+    direction: BOTH
+    dummy_receiver: false
+    after:
+      delimiter: "\n"
+    sequence:
+      - lambda: UARTDebug::log_string(direction, bytes);
+
+sensor:
+  - platform: internal_temperature
+    name: "ESP Temperature"
+    entity_category: diagnostic

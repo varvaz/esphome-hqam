@@ -37,7 +37,7 @@ external_components:
 
 packages:
   remote_package:
-    url: https://github.com/Bokenbergen/esphome-hqam
+    url: https://github.com/varvaz/esphome-hqam
     ref: main
     refresh: always
     files: [
